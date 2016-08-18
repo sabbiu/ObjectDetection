@@ -22,7 +22,7 @@ function varargout = ObjectDetection(varargin)
 
 % Edit the above text to modify the response to help ObjectDetection
 
-% Last Modified by GUIDE v2.5 18-Aug-2016 06:32:52
+% Last Modified by GUIDE v2.5 18-Aug-2016 22:59:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,9 +56,13 @@ function ObjectDetection_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 %Create tab group
-handles.tgroup = uitabgroup('Parent', handles.figure1,'TabLocation', 'top');
-handles.tab1 = uitab('Parent', handles.tgroup, 'Title', 'Training');
-handles.tab2 = uitab('Parent', handles.tgroup, 'Title', 'Testing');
+%uitab.BackgroundColor = [.5 .5 .5];
+handles.tgroup = uitabgroup('Parent', handles.figure1);
+handles.tab1 = uitab('Parent', handles.tgroup, 'Title', ...
+    '                                          Training                                          ');
+handles.tab2 = uitab('Parent', handles.tgroup, 'Title', ...
+    '                                          Testing                                          ');
+
 
 %Place panels into each tab
 set(handles.P1,'Parent',handles.tab1)
@@ -66,6 +70,15 @@ set(handles.P2,'Parent',handles.tab2)
 
 %Reposition each panel to same location as panel 1
 set(handles.P2,'position',get(handles.P1,'position'));
+
+% Setup UI
+% Browse Icon
+browse_icon = imread('browse_icon.jpg');
+browse_icon = imresize(browse_icon, [25 25]);
+set(handles.load_images_browse,'cdata',browse_icon);
+
+% Setup SIFT
+% setup_sift;
 
 
 % Update handles structure
@@ -84,3 +97,103 @@ function varargout = ObjectDetection_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
+
+% --- Executes on button press in load_images_btn.
+function load_images_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to load_images_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function load_images_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to load_images_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of load_images_edit as text
+%        str2double(get(hObject,'String')) returns contents of load_images_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function load_images_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to load_images_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Display default location in load_images_edit_text_box
+rootfolder = fullfile(pwd,'objectCategories');
+% handles.load_images_edit = 'Default';
+set(hObject,'String',rootfolder);
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in load_images_browse.
+function load_images_browse_Callback(hObject, eventdata, handles)
+% hObject    handle to load_images_browse (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function train_edit_Callback(hObject, eventdata, handles)
+% hObject    handle to train_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of train_edit as text
+%        str2double(get(hObject,'String')) returns contents of train_edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function train_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to train_edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in train_btn.
+function train_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to train_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on slider movement.
+function slider1_Callback(hObject, eventdata, handles)
+% hObject    handle to slider1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
