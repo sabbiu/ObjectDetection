@@ -22,7 +22,7 @@ function varargout = ObjectDetection(varargin)
 
 % Edit the above text to modify the response to help ObjectDetection
 
-% Last Modified by GUIDE v2.5 19-Aug-2016 11:50:17
+% Last Modified by GUIDE v2.5 19-Aug-2016 10:58:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,9 +81,8 @@ browse_icon = imread('browse_icon.jpg');
 browse_icon = imresize(browse_icon, [25 25]);
 set(handles.load_images_browse,'cdata',browse_icon);
 
-set(handles.load_images_btn,'Enable','on');
 % Setup SIFT
-run('vlfeat-0.9.20\toolbox\vl_setup');
+% setup_sift;
 
 
 % Update handles structure
@@ -111,25 +110,13 @@ function load_images_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 rootfolder = get(handles.load_images_edit,'String');
-
 imgSets = imageSet(rootfolder,'recursive');
-handles.imgSets = imgSets;
-guidata(hObject,handles);
 
-for i = 1:size(imgSets,2)
-    
-    categoryName = imgSets(1,i).Description;
-    imageCount = imgSets(1,i).Count;
-    string_to_disp = sprintf('%s%s %s%s   %s%s',num2str(i),'. ',categoryName,': ',num2str(imageCount),' training images');
-    set(handles.Message_disp,'String', ...
-        strvcat(get(handles.Message_disp,'String'), ...
-        string_to_disp));
-end
 
- set(handles.Message_disp,'String', ...
-        strvcat(get(handles.Message_disp,'String'), ...
-        'Images Loaded Successfully!!!',handles.line_in_msgdisp));
-set(hObject,'Enable','off');
+old_message = get(handles.Message_disp,'String');
+old_message
+new_message = sprintf('%s\n%s',old_message,'Images Loaded!!');%strcat(old_message,'\n','Images Loaded');
+set(handles.Message_disp,'String',new_message);
 
 
 % --- Executes on button press in pushbutton2.
@@ -174,9 +161,6 @@ function load_images_browse_Callback(hObject, eventdata, handles)
 
 folder_name = uigetdir(pwd,'Select folder with various Object Categories');
 set(handles.load_images_edit,'String',folder_name);
-set(handles.load_images_btn,'Enable','on');
-
-set(handles.Message_disp,'String',strvcat('Object Detection',handles.line_in_msgdisp));
 
 
 function train_edit_Callback(hObject, eventdata, handles)
@@ -506,9 +490,8 @@ function Message_disp_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 % Set global variables
-line_in_msgdisp = '----------------------------------------------------------------------------------------------';
-handles.line_in_msgdisp = line_in_msgdisp;
-guidata(hObject,handles);
+global line_in_msgdisp
+line_in_msgdisp = '--------------------------------------------------------------------------------------';
 
-
-set(hObject,'String',strvcat('Object Detection',handles.line_in_msgdisp));
+new_message = sprintf('%s\n%s\n%s','Object Detection', line_in_msgdisp,'Hello');
+set(hObject,'String',strvcat('Object Detection');
