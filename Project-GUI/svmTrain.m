@@ -73,8 +73,8 @@ else
 end
 
 % Train
-fprintf('\nTraining ...');
-dots = 12;
+%fprintf('\nTraining ...');
+% dots = 12;
 while passes < max_passes,
             
     num_changed_alphas = 0;
@@ -168,17 +168,17 @@ while passes < max_passes,
         passes = 0;
     end
 
-    fprintf('.');
-    dots = dots + 1;
-    if dots > 78
-        dots = 0;
-        fprintf('\n');
-    end
-    if exist('OCTAVE_VERSION')
-        fflush(stdout);
-    end
+%     fprintf('.');
+%     dots = dots + 1;
+%     if dots > 78
+%         dots = 0;
+%         fprintf('\n');
+%     end
+%     if exist('OCTAVE_VERSION')
+%         fflush(stdout);
+%     end
 end
-fprintf(' Done! \n\n');
+% fprintf(' Done! \n\n');
 
 % Save the model
 idx = alphas > 0;
