@@ -343,7 +343,7 @@ set(handles.Message_disp,'String', ...
         set(handles.Message_disp,'Value',index);
 drawnow
 
-save('cluster_centers','centers');
+save('cluster_centerstwo','centers');
 save('cluster_values','dist_n_val');
 save('features_all','features_all');
 save('features_each','features_each');
@@ -407,7 +407,7 @@ set(handles.animation_bow,'Backgroundcolor','g');
 drawnow
 % svm started
 trained_models = object_det_4();
-save('trained_models.mat','trained_models');
+save('trained_modelstwo.mat','trained_models');
 
  set(handles.Message_disp,'String', ...
         strvcat(get(handles.Message_disp,'String'), ...
@@ -474,7 +474,8 @@ function testing_load_image_browse_Callback(hObject, eventdata, handles)
 % hObject    handle to testing_load_image_browse (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+axes(handles.testing_load_image_show); % Make averSpec the current axes.
+cla reset;
 global im im2
 [path, user_cance] = imgetfile();
 set(handles.testing_load_image_text,'String',path);
@@ -780,8 +781,8 @@ end
     hold on;
         rectangle('Position',[thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
             'EdgeColor','y','LineWidth',2);
-        text(thisBB(1),thisBB(2)+thisBB(4)+9,disp_text,'FontSize',15 );
-        
+        text(thisBB(1),thisBB(2)+thisBB(4)+12,disp_text,'FontSize',15);
+        drawnow;
 end
 
 save('histogram_temp.mat','histogram_temp');
@@ -902,6 +903,8 @@ if button_state == get(hObject,'Max')
     end
 
 elseif button_state == get(hObject,'Min')
+    axes(handles.testing_load_image_show); % Make averSpec the current axes.
+cla reset;
     set(handles.Test_play,'cdata',play_icon);
     axes(handles.testing_load_image_show);
 

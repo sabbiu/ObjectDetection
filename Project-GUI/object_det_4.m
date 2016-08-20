@@ -26,8 +26,7 @@ for i=1:size(imgSets,2)
         
     end
     
-    
-    
+   
     Z = [Z; {imgSets(1,i).Description}];
 end
 
@@ -37,6 +36,8 @@ if exist(file_path,'file')
     
     X = [X; reinf_histogram{1,1}];
     Y = [Y; reinf_histogram{1,2}];
+    
+    
     
 end
 
