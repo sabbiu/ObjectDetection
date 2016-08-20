@@ -22,7 +22,7 @@ function varargout = ObjectDetection(varargin)
 
 % Edit the above text to modify the response to help ObjectDetection
 
-% Last Modified by GUIDE v2.5 19-Aug-2016 14:44:39
+% Last Modified by GUIDE v2.5 19-Aug-2016 22:01:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,11 +81,22 @@ browse_icon = imread('browse_icon.jpg');
 browse_icon = imresize(browse_icon, [25 25]);
 set(handles.load_images_browse,'cdata',browse_icon);
 set(handles.testing_load_image_browse,'cdata',browse_icon);
-set(handles.load_model_btn,'cdata',browse_icon);
+
+
+global play_icon_off play_icon
+
+play_icon = imread('run.jpg');
+play_icon = imresize(play_icon, [36 36]);
+set(handles.Test_play,'cdata',play_icon);
+
+play_icon_off = imread('runoff.jpg');
+play_icon_off = imresize(play_icon_off,[36 36]);
+% set(handles.Test_play,'cdata',play_icon_off);
+
 
 set(handles.train_btn,'Enable','off');
 set(handles.load_images_btn,'Enable','on');
-
+set(handles.image_edit_panel,'Visible','off');
 % Setup SIFT
 run('vlfeat-0.9.20\toolbox\vl_setup');
 
@@ -119,7 +130,7 @@ rootfolder = get(handles.load_images_edit,'String');
 imgSets = imageSet(rootfolder,'recursive');
 handles.imgSets = imgSets;
 guidata(hObject,handles);
-
+save('imgSets.mat','imgSets');
 for i = 1:size(imgSets,2)
     
     categoryName = imgSets(1,i).Description;
@@ -332,6 +343,12 @@ set(handles.Message_disp,'String', ...
         set(handles.Message_disp,'Value',index);
 drawnow
 
+save('cluster_centers','centers');
+save('cluster_values','dist_n_val');
+save('features_all','features_all');
+save('features_each','features_each');
+save('features_category','features_category');
+
 % kmeans ended
 
 set(handles.animation_kmeans,'Backgroundcolor','g');
@@ -389,61 +406,9 @@ set(handles.animation_bow,'Backgroundcolor','g');
 
 drawnow
 % svm started
+trained_models = object_det_4();
+save('trained_models.mat','trained_models');
 
-X = []; % stores the features
-Y = []; % stores the category
-Z = []; % stores the names
-    
-for i=1:size(handles.imgSets,2)
-    
-    for j = 1:handles.imgSets(1,i).Count
-        file_path = char(handles.imgSets(1,i).ImageLocation(1,j));
-        [pathstr,name,ext] = fileparts(file_path);
-        load(char(strcat(pathstr,'\histograms\',name,'hist.mat')),'histogram');
-        X = [X; histogram];
-        Y = [Y; i];
-        
-    end
-    
-    
-    
-    Z = [Z; {handles.imgSets(1,i).Description}];
-end
-
-file_path = fullfile('objectCategories','reinf_histogram.mat');
-if exist(file_path,'file')
-    load('objectCategories\reinf_histogram');
-    
-    X = [X; reinf_histogram{1,1}];
-    Y = [Y; reinf_histogram{1,2}];
-end
-
-
-trained_models = {};
-for i = 1:size(Z,1)
-    
-    set(handles.Message_disp,'String', ...
-        strvcat(get(handles.Message_disp,'String'), ...
-        sprintf('%s%s%s','Training for ',handles.imgSets(1,i).Description,' ...')));
-        index = size(get(handles.Message_disp,'String'), 1);
-        set(handles.Message_disp,'Value',index);
-drawnow
-
-    
-    Y_new = Y;
-    
-    Y_new(Y_new ~= i) = 0;
-    Y_new(Y_new == i) = 1;
-    
-    C = 0.1; sigma = 0.1;
-    model = svmTrain(X, Y_new, C, @(x1,x2) gaussianKernel(x1,x2, sigma));
-
-    [p,q] = svmPredict(model, X);
-    
-    trained_models{i} = struct('model',model, ...
-                         'name',Z(i));
-    fprintf('Training Accuracy: %f\n', mean(double(p == Y_new)) * 100);
-end
  set(handles.Message_disp,'String', ...
         strvcat(get(handles.Message_disp,'String'), ...
         'Successfully Trained!!!',handles.line_in_msgdisp,' ',...
@@ -456,6 +421,8 @@ drawnow
 
 set(handles.animation_svm,'Backgroundcolor','g');
 drawnow
+
+
         
 % --- Executes on slider movement.
 function slider1_Callback(hObject, eventdata, handles)
@@ -508,6 +475,24 @@ function testing_load_image_browse_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global im im2
+[path, user_cance] = imgetfile();
+set(handles.testing_load_image_text,'String',path);
+if user_cance
+    msgbox(sprintf('Error'),'Error','Error');
+    return
+end
+set(handles.image_edit_panel,'Visible','on');
+im = imread(path);
+save('path.mat','path');
+im2=im;
+
+adjust(handles);
+
+
+
+
+
 
 % --- Executes on slider movement.
 function slider_brightness_Callback(hObject, eventdata, handles)
@@ -518,12 +503,49 @@ function slider_brightness_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
+val = get(hObject,'Value');
+
+set(handles.edit_brightness,'String',num2str(val));
+adjust(handles);
+
+function adjust(handles)
+
+global im im2 im3
+im=im2;
+im3 = im;
+a=0;
+b=1;
+c=0;
+d=1;
+val_b = get(handles.slider_brightness,'Value');
+val_c = get(handles.slider_contrast,'Value');
+
+if(val_b < 0)
+    val_b = -1*val_b;
+    d =d - val_b/100;
+else
+    c = c + val_b/100;
+end
+
+if(val_c < 0)
+    val_c = -1*val_c;
+    a =a + val_c/100;
+else
+    b = b - val_c/100;
+end
+
+%searchme
+axes(handles.testing_load_image_show);
+im = imadjust(im, [a b],[c d]);
+im3 = im;
+imshow(im);
 
 % --- Executes during object creation, after setting all properties.
 function slider_brightness_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider_brightness (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+set(hObject,'Value',0);
 
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -539,6 +561,10 @@ function slider_contrast_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+val = get(hObject,'Value');
+
+set(handles.edit_contrast,'String',num2str(val));
+adjust(handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -546,7 +572,7 @@ function slider_contrast_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider_contrast (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
+set(hObject,'Value',0);
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
@@ -596,6 +622,8 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
+val = get(hObject,'String');
+val = str2num(val);
 
 
 function edit_brightness_Callback(hObject, eventdata, handles)
@@ -605,6 +633,20 @@ function edit_brightness_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit_brightness as text
 %        str2double(get(hObject,'String')) returns contents of edit_brightness as a double
+val = get(hObject,'String');
+val = str2num(val);
+if(size(val,1)==0)
+    msgbox(sprintf('Error'),'Error','Error');
+    return
+end
+if(val>100)
+    val =100;
+end
+if(val<-100)
+    val = -100;
+end
+set(handles.slider_brightness,'Value',val);
+adjust(handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -628,7 +670,20 @@ function edit_contrast_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit_contrast as text
 %        str2double(get(hObject,'String')) returns contents of edit_contrast as a double
-
+val = get(hObject,'String');
+val = str2num(val);
+if(size(val,1)==0)
+    msgbox(sprintf('Error'),'Error','Error');
+    return
+end
+if(val>100)
+    val =100;
+end
+if(val<-100)
+    val = -100;
+end
+set(handles.slider_contrast,'Value',val);
+adjust(handles);
 
 % --- Executes during object creation, after setting all properties.
 function edit_contrast_CreateFcn(hObject, eventdata, handles)
@@ -694,6 +749,44 @@ function Detect_image_Callback(hObject, eventdata, handles)
 % hObject    handle to Detect_image (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global im3 im
+
+bounding_rect = localize(im);
+load('trained_models');
+histogram_temp = []; descp = [];
+for i=1:length(bounding_rect)
+    thisBB = bounding_rect(i).BoundingBox;
+    test_image = imcrop(im3, [thisBB(1),thisBB(2),thisBB(3),thisBB(4)]);
+if(size(test_image,3)>1)
+    test_image = rgb2gray(test_image);
+end
+    imwrite(mat2gray(test_image),'temporary_crop.jpg');
+    histogram = generate_bow('temporary_crop.jpg');
+    histogram_temp = [histogram_temp; histogram];
+    
+    [a(1,1),a(2,1)] = svmPredict(trained_models{1}.model,histogram);
+        [a(1,2),a(2,2)] = svmPredict(trained_models{2}.model,histogram);
+        [a(1,3),a(2,3)] = svmPredict(trained_models{3}.model,histogram);
+        
+        [m, idx] = max(a,[],2);
+        
+        if(m(1,:) == 1 )
+            disp_text = trained_models{idx(2,:)}.name;
+            descp = [descp;idx(2,:)];
+        else
+            disp_text = 'Not identified!';
+        end
+        
+    hold on;
+        rectangle('Position',[thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
+            'EdgeColor','y','LineWidth',2);
+        text(thisBB(1),thisBB(2)+thisBB(4)+9,disp_text,'FontSize',15 );
+        
+end
+
+save('histogram_temp.mat','histogram_temp');
+save('bounding_rect.mat','bounding_rect');
+save('descp.mat','descp');
 
 
 % --- Executes on button press in togglebutton1.
@@ -733,14 +826,17 @@ function load_model_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to load_model_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+file_path = fullfile(pwd,'trainedModels');
+filename = uigetfile({'*.mat' },'mytitle',...
+          file_path);
+set(handles.load_model_edit,'String',filename);
 
 % --- Executes on button press in Reinforce.
 function Reinforce_Callback(hObject, eventdata, handles)
 % hObject    handle to Reinforce (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+Reinforcement;
 
 % --- Executes on button press in correct_btn.
 function correct_btn_Callback(hObject, eventdata, handles)
@@ -779,3 +875,45 @@ function load_images_browse_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to load_images_browse (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --- Executes on button press in Test_play.
+function Test_play_Callback(hObject, eventdata, handles)
+% hObject    handle to Test_play (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global play_icon_off play_icon im bounding_rect im3
+button_state = get(hObject,'Value');
+% axes(handles.testing_load_image_show);
+% imshow(im);
+if button_state == get(hObject,'Max')
+    set(handles.Test_play,'cdata',play_icon_off);
+	% localize;
+    im3 = im;
+    bounding_rect = localize(im);
+    for k = 1 : length(bounding_rect)
+  thisBB = bounding_rect(k).BoundingBox;
+   if(thisBB(3)<40)
+       continue;
+   end
+   hold on
+  rectangle('Position', [thisBB(1),thisBB(2),thisBB(3),thisBB(4)],...
+  'EdgeColor','y','LineWidth',2 )
+    end
+
+elseif button_state == get(hObject,'Min')
+    set(handles.Test_play,'cdata',play_icon);
+    axes(handles.testing_load_image_show);
+
+    imshow(im3);
+	%
+end
+
+% --- Executes on key press with focus on edit_brightness and none of its controls.
+function edit_brightness_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to edit_brightness (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)

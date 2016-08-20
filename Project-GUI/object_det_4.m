@@ -8,8 +8,8 @@
 %% ============== Part 5. Manage the training sets ====================
 % Here, the training sets are managed so that it is ready to be trained
 % with SVM (SMO)
-clear all;
-load('imageSet.mat','imgSets');
+function [trained_models] =  object_det_4()
+load('imgSets.mat','imgSets');
 
 X = []; % stores the features
 Y = []; % stores the category
@@ -37,6 +37,7 @@ if exist(file_path,'file')
     
     X = [X; reinf_histogram{1,1}];
     Y = [Y; reinf_histogram{1,2}];
+    
 end
 
 
@@ -51,12 +52,13 @@ for i = 1:size(Z,1)
     
     C = 0.1; sigma = 0.1;
     model = svmTrain(X, Y_new, C, @(x1,x2) gaussianKernel(x1,x2, sigma));
-
+% save('xmat.mat','X');
+%     save('ymat.mat','Y_new');
     [p,q] = svmPredict(model, X);
     
     trained_models{i} = struct('model',model, ...
                          'name',Z(i));
-    fprintf('Training Accuracy: %f\n', mean(double(p == Y_new)) * 100);
+    
 end
 
-save('trained_models.mat','trained_models');
+end
