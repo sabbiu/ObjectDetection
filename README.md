@@ -26,7 +26,7 @@ SVM Classifier (SMO Optimization)
 For classification of images
 ```
 To get detailed understanding of these topics, I recommend you to go through the followings:  
-1. David Lowe article on [SIFT Keypoints](https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)  
+1. David Lowe's article on [SIFT Keypoints](https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)  
 2. Andrew-Ng Machine Learning course from Cousera
 
 ##Project coded in Matlab 2015b
@@ -35,26 +35,26 @@ There are two folders viz. Project-CLI and Project-GUI. You can copy the images 
 ##Run this project
 This project was done in Matlab 2015b.  
 
-**Start with Project-CLI**
+**Start with Project-CLI**  
 run the scripts as listed below:  
-1. object_det_1.m
-2. object_det_2.m
-3. object_det_3.m
-4. object_det_4.m
+1. object_det_1.m  
+2. object_det_2.m  
+3. object_det_3.m  
+4. object_det_4.m  
 Till here your training model will be generated.  
-Now, your testing image will be passed for localization and it asks for reinforcement
-5. object_det_5.m
+Now, your testing image will be passed for localization and it asks for reinforcement  
+5. object_det_5.m  
 
-**Start with Project-GUI**
+**Start with Project-GUI**  
 run the script:
 **objectDetection.m**
 
 ##Comprehensive Understanding of the project
 
-Our project can be divided to three different categories
-1. Training
-2. Testing
-3. Reinforcement Learning
+Our project can be divided to three different categories:  
+1. Training  
+2. Testing  
+3. Reinforcement Learning  
 
 ####Training
 Firstly, all the images location are loaded in a matrix. Here, we have three categories of images (Thus, three folders inside our ImageCategories Folder). There is a variable named imageSets with three cells (one for each category/folder). Each cell contains Description(name of the folder), Count(no. of images in that particular folder) and Location(location of all the images inside that folder).
