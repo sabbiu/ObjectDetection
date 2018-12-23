@@ -36,7 +36,7 @@ To get detailed understanding of these topics, I recommend you to go through the
 ## Project coded in Matlab 2015b
 There are two folders viz. Project-CLI and Project-GUI. You can copy the images from Project-GUI to Project-CLI and start working with the Command Line version of the project.
 
-##Run this project
+## Run this project
 This project was done in Matlab 2015b.  
 
 **Start with Project-CLI**  
