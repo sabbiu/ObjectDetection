@@ -1,10 +1,11 @@
-#ObjectDetection
+# ObjectDetection
+
 A starter's guide to Object Detection and Learning
 
-##Output
+## Output
 ![output](https://cloud.githubusercontent.com/assets/19733021/18026801/98d28594-6c71-11e6-91a5-6b1059c634ab.JPG)
 
-##Scope of the Project
+## Scope of the Project
 
 This project classifies three different object categories viz. 
 **Coins**
@@ -17,7 +18,7 @@ and
  In case it misinterprets the object with other item, we can always reinforce it and 
  improve our learning model.
 
-##Terms You Need To Know About
+## Terms You Need To Know About
 ```
 SIFT  
 For feature extraction
@@ -32,7 +33,7 @@ To get detailed understanding of these topics, I recommend you to go through the
 1. David Lowe's article on [SIFT Keypoints](https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)  
 2. Andrew-Ng Machine Learning course from Cousera
 
-##Project coded in Matlab 2015b
+## Project coded in Matlab 2015b
 There are two folders viz. Project-CLI and Project-GUI. You can copy the images from Project-GUI to Project-CLI and start working with the Command Line version of the project.
 
 ##Run this project
@@ -52,14 +53,14 @@ Now, your testing image will be passed for localization and it asks for reinforc
 run the script:
 **objectDetection.m**
 
-##Comprehensive Understanding of the project
+## Comprehensive Understanding of the project
 
 Our project can be divided to three different categories:  
 1. Training  
 2. Testing  
 3. Reinforcement Learning  
 
-####Training
+#### Training
 Firstly, all the images location are loaded in a matrix. Here, we have three categories of images (Thus, three folders inside our ImageCategories Folder). There is a variable named imageSets with three cells (one for each category/folder). Each cell contains Description(name of the folder), Count(no. of images in that particular folder) and Location(location of all the images inside that folder).
 
 Then, using
@@ -72,7 +73,7 @@ Then, for each image a histogram with these words was formed by counting the num
 
 Finally, all these normalized histogram were passed to a binary SVM classifier (using one vs all approach to identify different categories of images) and a model for each category was obtained. Hence, the objects were learned.
 
-####Testing
+#### Testing
 If you are viewing the CLI version, the test image needs to contain four objects in a blank white sheet of paper and all the objects must be placed in its own grid(where, a grid represents a part of that blank white sheet formed after folding it in half vertically and again horizontally).
 
 If you are viewing the GUI version, the test image can contain any number of objects, which cannot touch each other and it must also be in blank white sheet of paper.
@@ -85,9 +86,9 @@ Testing Algorithm first extracts SIFT descriptors from the cropped images, then 
 
 Then, it passes the normalized histogram along with all the training model in a loop and gets the scores for each models. It, then compares and finds the maximum score and identifies it as the object.
 
-####Reinforcement Learning
+#### Reinforcement Learning
 Incase our image is identified incorrectly, in the end, it asks user whether our is image is identified correctly or not. We can write y for correct identification and n for incorrect. When, we say that the image is identified incorrectly, it gives us options to choose from to match the object. It then passes the normalized histogram for those incorrect images and its respective value(choosen/corrected by the user) and adds these features to our new variable called reinf_histogram and saves it to reinf_histogram.mat and generates a new model for each categories again by learning all these new histograms along with previously saved histogram.
 
-##Improvement that can be done
-####Localization
+## Improvement that can be done
+#### Localization
 For the testing purposes, our objects need to be placed on a blank white sheet of paper. One, can improve this project by improving the localization.
